@@ -4,6 +4,15 @@ const app = express()
 const {bots, playerRecord} = require('./data')
 const {shuffleArray} = require('./utils')
 
+var Rollbar = require('rollbar')
+var rollbar = new Rollbar({
+  accessToken: 'e3c64b2946644285876eb873fece4981',
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+})
+
+rollbar.log('Hello world!')
+
 app.use(express.static("public"));
 
 app.get("/styles", (req, res) => {
@@ -16,6 +25,7 @@ app.get("/js", (req, res) => {
 app.use(express.json())
 
 app.get('/api/robots', (req, res) => {
+    rollbar.info('getting bots from db')
     try {
         res.status(200).send(bots)
     } catch (error) {
@@ -25,6 +35,7 @@ app.get('/api/robots', (req, res) => {
 })
 
 app.get('/api/robots/five', (req, res) => {
+    rollbar.info('shuffling')
     try {
         let shuffled = shuffleArray(bots)
         let choices = shuffled.slice(0, 5)
@@ -37,6 +48,7 @@ app.get('/api/robots/five', (req, res) => {
 })
 
 app.post('/api/duel', (req, res) => {
+    rollbar.info('posting player stats')
     try {
         // getting the duos from the front end
         let {compDuo, playerDuo} = req.body
@@ -68,6 +80,7 @@ app.post('/api/duel', (req, res) => {
 })
 
 app.get('/api/player', (req, res) => {
+    rollbar.info('getting player stats')
     try {
         res.status(200).send(playerRecord)
     } catch (error) {
